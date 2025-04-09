@@ -1,0 +1,41 @@
+@babbly_comment_service_HostAddress = http://localhost:5004
+
+### Get all comments
+GET {{babbly_comment_service_HostAddress}}/api/Comment
+Accept: application/json
+
+### Get comment by ID
+@commentId = d99bdd02-fb42-4dd4-a967-878293d6e206
+GET {{babbly_comment_service_HostAddress}}/api/Comment/{{commentId}}
+Accept: application/json
+
+### Get comments by post ID
+@postId = 00000000-0000-0000-0000-000000000000
+GET {{babbly_comment_service_HostAddress}}/api/Comment/post/{{postId}}
+Accept: application/json
+
+### Get comments by user ID
+@userId = user123
+GET {{babbly_comment_service_HostAddress}}/api/Comment/user/{{userId}}
+Accept: application/json
+
+### Create a comment
+POST {{babbly_comment_service_HostAddress}}/api/Comment
+Content-Type: application/json
+
+{
+  "content": "This is a test comment",
+  "postId": "{{postId}}",
+  "userId": "{{userId}}"
+}
+
+### Update a comment
+PUT {{babbly_comment_service_HostAddress}}/api/Comment/{{commentId}}
+Content-Type: application/json
+
+{
+  "content": "This comment has been updated"
+}
+
+### Delete a comment
+DELETE {{babbly_comment_service_HostAddress}}/api/Comment/{{commentId}}

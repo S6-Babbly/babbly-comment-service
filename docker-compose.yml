@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: babbly-comment-service/Dockerfile
+    ports:
+      - "5004:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CassandraHosts=cassandra
+      - CassandraKeyspace=babbly_comments
+      - CassandraUsername=${CASSANDRA_USER:-cassandra}
+      - CassandraPassword=${CASSANDRA_PASSWORD:-cassandra}
+    restart: unless-stopped
+    depends_on:
+      cassandra:
+        condition: service_healthy
+
+  cassandra:
+    image: cassandra:latest
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+      - ./scripts/init-scripts:/docker-entrypoint-initdb.d
+    environment:
+      - CASSANDRA_CLUSTER_NAME=babbly_cluster
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+    command: ["sh", "-c", "docker-entrypoint.sh cassandra -f & (sleep 60 && echo 'Running init scripts...' && for f in /docker-entrypoint-initdb.d/*.cql; do echo Executing $$f; cqlsh -f $$f; done) & wait"]
+
+volumes:
+  cassandra_data: 

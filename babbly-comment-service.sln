@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "babbly-comment-service", "babbly-comment-service\babbly-comment-service.csproj", "{93890B55-BB6C-4D11-90E2-C86DA1A3D583}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93890B55-BB6C-4D11-90E2-C86DA1A3D583}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93890B55-BB6C-4D11-90E2-C86DA1A3D583}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93890B55-BB6C-4D11-90E2-C86DA1A3D583}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93890B55-BB6C-4D11-90E2-C86DA1A3D583}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D80B5539-CB58-462F-A0BB-D3FA209063CD}
+	EndGlobalSection
+EndGlobal
