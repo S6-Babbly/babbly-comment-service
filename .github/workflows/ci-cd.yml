@@ -1,4 +1,4 @@
-name: Like Service CI/CD Pipeline
+name: Comment Service CI/CD Pipeline
 
 on:
   push:
@@ -102,19 +102,19 @@ jobs:
       - name: Build and push Backend
         run: |
           # Always build the image
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/babbly-like-service:${{ github.sha }} -f babbly-like-service/Dockerfile .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/babbly-comment-service:${{ github.sha }} -f babbly-comment-service/Dockerfile .
 
           # Only push to DockerHub on main branch
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/babbly-like-service:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/babbly-like-service:latest
-            docker push ${{ secrets.DOCKERHUB_USERNAME }}/babbly-like-service:${{ github.sha }}
-            docker push ${{ secrets.DOCKERHUB_USERNAME }}/babbly-like-service:latest
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/babbly-comment-service:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/babbly-comment-service:latest
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/babbly-comment-service:${{ github.sha }}
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/babbly-comment-service:latest
           fi
 
       # Simple container verification without health check
       - name: Verify container starts
         run: |
-          docker run --rm -d --name test-backend ${{ secrets.DOCKERHUB_USERNAME }}/babbly-like-service:${{ github.sha }}
+          docker run --rm -d --name test-backend ${{ secrets.DOCKERHUB_USERNAME }}/babbly-comment-service:${{ github.sha }}
           sleep 5
           docker logs test-backend
           docker stop test-backend 
