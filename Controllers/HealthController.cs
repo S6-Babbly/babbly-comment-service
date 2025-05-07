@@ -6,7 +6,7 @@ using System;
 namespace babbly_comment_service.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/health")]
     public class HealthController : ControllerBase
     {
         private readonly Cassandra.ISession _session;
