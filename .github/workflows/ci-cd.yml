@@ -36,15 +36,9 @@ jobs:
       - name: Cache SonarQube packages
         uses: actions/cache@v4
         with:
-          path: ~\sonar\cache
+          path: ~\\sonar\\cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-
-      - name: Download coverage reports
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-reports
-          path: ./coverage
 
       - name: Cache SonarQube scanner
         id: cache-sonar-scanner
@@ -67,7 +61,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"S6-Babbly_babbly-comment-service" /o:"babblyisgeweldig" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.sources="." /d:sonar.exclusions="**/node_modules/**,**/bin/**,**/obj/**,**/*.test.js,**/*.spec.js" /d:sonar.cs.opencover.reportsPaths="coverage/coverage.opencover.xml"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"S6-Babbly_babbly-comment-service" /o:"babblyisgeweldig" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.sources="." /d:sonar.exclusions="**/node_modules/**,**/bin/**,**/obj/**,**/*.test.js,**/*.spec.js"
           dotnet build ./babbly-comment-service.csproj --no-restore
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
@@ -89,14 +83,7 @@ jobs:
         run: dotnet build ./babbly-comment-service.csproj --no-restore
 
       - name: Test
-        run: dotnet test ./babbly-comment-service.csproj --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage --logger "trx;LogFileName=test-results.trx"
-
-      - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-reports
-          path: ./coverage/coverage.opencover.xml
-          if-no-files-found: error
+        run: dotnet test ./babbly-comment-service.csproj --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
 
   docker-build-and-push:
     name: Docker Build and Push to Docker Hub
