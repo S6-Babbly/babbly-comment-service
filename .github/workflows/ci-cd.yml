@@ -62,7 +62,7 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"S6-Babbly_babbly-comment-service" /o:"babblyisgeweldig" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.sources="." /d:sonar.exclusions="**/node_modules/**,**/bin/**,**/obj/**,**/*.test.js,**/*.spec.js"
-          dotnet build ./babbly-comment-service.csproj --no-restore
+          dotnet build ./babbly-comment-service.csproj
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
   backend-tests:
