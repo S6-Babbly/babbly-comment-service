@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: comment-service
-        image: babbly-comment-service:latest
+        image: morrishh/babbly-comment-service:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
