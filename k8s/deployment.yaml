@@ -19,7 +19,7 @@ spec:
         image: morrishh/babbly-comment-service:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8080
+        - containerPort: 8082
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Development"
