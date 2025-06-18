@@ -294,5 +294,35 @@ namespace babbly_comment_service.Controllers
 
             return "Just now";
         }
+
+        // DELETE: api/Comment/user/{userId}
+        [HttpDelete("user/{userId}")]
+        public async Task<IActionResult> DeleteAllCommentsByUser(string userId)
+        {
+            try
+            {
+                _logger.LogInformation("Deleting all comments for user {UserId}", userId);
+                
+                // Get all comments by the user
+                var userComments = await _mapper.FetchAsync<Comment>("WHERE user_id = ?", userId);
+                var commentsList = userComments.ToList();
+                
+                _logger.LogInformation("Found {Count} comments to delete for user {UserId}", commentsList.Count, userId);
+                
+                // Delete each comment
+                foreach (var comment in commentsList)
+                {
+                    await _mapper.DeleteAsync<Comment>("WHERE id = ?", comment.Id);
+                }
+                
+                _logger.LogInformation("Successfully deleted {Count} comments for user {UserId}", commentsList.Count, userId);
+                return Ok(new { message = $"Deleted {commentsList.Count} comments for user {userId}" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting comments for user {UserId}", userId);
+                return StatusCode(500, "Internal server error");
+            }
+        }
     }
 } 
