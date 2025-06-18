@@ -102,16 +102,35 @@ namespace babbly_comment_service.Controllers
         {
             try
             {
+                // Get authenticated user ID from JWT headers (forwarded by API Gateway)
+                var userId = Request.Headers["X-User-Id"].FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return Unauthorized(new { error = "Authentication required. User ID not found in token." });
+                }
+
+                // Validate content
+                if (string.IsNullOrWhiteSpace(createCommentDto.Content))
+                {
+                    return BadRequest(new { error = "Comment content cannot be empty" });
+                }
+
+                if (createCommentDto.Content.Length > 500)
+                {
+                    return BadRequest(new { error = "Comment content cannot exceed 500 characters" });
+                }
+
                 var comment = new Comment
                 {
                     Id = Guid.NewGuid(),
-                    Content = createCommentDto.Content,
+                    Content = createCommentDto.Content.Trim(),
                     PostId = createCommentDto.PostId,
-                    UserId = createCommentDto.UserId,
+                    UserId = userId,
                     CreatedAt = DateTime.UtcNow
                 };
 
                 await _mapper.InsertAsync(comment);
+                _logger.LogInformation("User {UserId} created comment {CommentId} on post {PostId}", userId, comment.Id, createCommentDto.PostId);
                 return CreatedAtAction(nameof(GetComment), new { id = comment.Id }, comment);
             }
             catch (Exception ex)
@@ -127,14 +146,40 @@ namespace babbly_comment_service.Controllers
         {
             try
             {
+                // Get authenticated user ID from JWT headers
+                var userId = Request.Headers["X-User-Id"].FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return Unauthorized(new { error = "Authentication required. User ID not found in token." });
+                }
+
                 var existingComment = await _mapper.SingleOrDefaultAsync<Comment>("WHERE id = ?", id);
                 if (existingComment == null)
                 {
-                    return NotFound();
+                    return NotFound(new { error = "Comment not found" });
                 }
 
-                existingComment.Content = updateCommentDto.Content;
+                // Ensure user can only edit their own comments
+                if (existingComment.UserId != userId)
+                {
+                    return Forbid("You can only edit your own comments");
+                }
+
+                // Validate content
+                if (string.IsNullOrWhiteSpace(updateCommentDto.Content))
+                {
+                    return BadRequest(new { error = "Comment content cannot be empty" });
+                }
+
+                if (updateCommentDto.Content.Length > 500)
+                {
+                    return BadRequest(new { error = "Comment content cannot exceed 500 characters" });
+                }
+
+                existingComment.Content = updateCommentDto.Content.Trim();
                 await _mapper.UpdateAsync(existingComment);
+                
+                _logger.LogInformation("User {UserId} updated comment {CommentId}", userId, id);
                 return NoContent();
             }
             catch (Exception ex)
@@ -150,13 +195,28 @@ namespace babbly_comment_service.Controllers
         {
             try
             {
+                // Get authenticated user ID from JWT headers
+                var userId = Request.Headers["X-User-Id"].FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return Unauthorized(new { error = "Authentication required. User ID not found in token." });
+                }
+
                 var comment = await _mapper.SingleOrDefaultAsync<Comment>("WHERE id = ?", id);
                 if (comment == null)
                 {
-                    return NotFound();
+                    return NotFound(new { error = "Comment not found" });
+                }
+
+                // Ensure user can only delete their own comments
+                if (comment.UserId != userId)
+                {
+                    return Forbid("You can only delete your own comments");
                 }
 
                 await _mapper.DeleteAsync<Comment>("WHERE id = ?", id);
+                
+                _logger.LogInformation("User {UserId} deleted comment {CommentId}", userId, id);
                 return NoContent();
             }
             catch (Exception ex)
