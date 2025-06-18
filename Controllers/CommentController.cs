@@ -70,9 +70,11 @@ namespace babbly_comment_service.Controllers
             {
                 _logger.LogInformation("Getting comments for post with ID: {PostId}, page: {Page}, pageSize: {PageSize}", postId, page, pageSize);
                 
-                // Get all comments for the post (ordered by creation date descending)
-                var allComments = await _mapper.FetchAsync<Comment>("WHERE post_id = ? ORDER BY created_at DESC", postId);
-                var commentList = allComments.ToList();
+                // Get all comments for the post
+                var allComments = await _mapper.FetchAsync<Comment>("WHERE post_id = ?", postId);
+                
+                // Sort by creation date descending (newest first) in C# since Cassandra table doesn't have clustering columns
+                var commentList = allComments.OrderByDescending(c => c.CreatedAt).ToList();
                 
                 // Calculate pagination
                 var total = commentList.Count;
