@@ -64,13 +64,35 @@ namespace babbly_comment_service.Controllers
 
         // GET: api/Comment/post/{postId}
         [HttpGet("post/{postId}")]
-        public async Task<ActionResult<IEnumerable<CommentDto>>> GetCommentsByPost(Guid postId)
+        public async Task<ActionResult> GetCommentsByPost(Guid postId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
-                _logger.LogInformation("Getting comments for post with ID: {PostId}", postId);
-                var comments = await _mapper.FetchAsync<Comment>("WHERE post_id = ?", postId);
-                return Ok(comments.Select(c => MapCommentToDto(c)));
+                _logger.LogInformation("Getting comments for post with ID: {PostId}, page: {Page}, pageSize: {PageSize}", postId, page, pageSize);
+                
+                // Get all comments for the post (ordered by creation date descending)
+                var allComments = await _mapper.FetchAsync<Comment>("WHERE post_id = ? ORDER BY created_at DESC", postId);
+                var commentList = allComments.ToList();
+                
+                // Calculate pagination
+                var total = commentList.Count;
+                var skip = (page - 1) * pageSize;
+                var paginatedComments = commentList.Skip(skip).Take(pageSize).ToList();
+                
+                // Map to DTOs
+                var commentDtos = paginatedComments.Select(c => MapCommentToDto(c)).ToList();
+                
+                // Return paginated response format expected by frontend
+                var response = new
+                {
+                    items = commentDtos,
+                    total = total,
+                    page = page,
+                    pageSize = pageSize,
+                    totalPages = (int)Math.Ceiling((double)total / pageSize)
+                };
+                
+                return Ok(response);
             }
             catch (Exception ex)
             {
